@@ -45,5 +45,12 @@ export const weatherAgent = new Agent({
       },
     },
   },
-  memory: new Memory(),
+  memory: new Memory({
+    options: {
+      workingMemory: {
+        enabled: true,
+      },
+    },
+  }
+  ),
 });

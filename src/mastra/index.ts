@@ -14,7 +14,8 @@ export const mastra = new Mastra({
   storage: new LibSQLStore({
     id: "mastra-storage",
     // stores observability, scores, ... into persistent file storage
-    url: "file:./mastra.db",
+    // Using absolute path so both next dev and mastra dev share the same DB
+    url: `file:${new URL("../../mastra.db", import.meta.url).pathname}`,
   }),
   logger: new PinoLogger({
     name: 'Mastra',
