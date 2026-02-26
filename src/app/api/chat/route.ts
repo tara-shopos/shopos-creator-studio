@@ -4,19 +4,20 @@ import { createUIMessageStreamResponse } from 'ai';
 import { mastra } from '@/mastra';
 import { NextResponse } from 'next/server';
 
-const THREAD_ID = 'example-user-id';
-const RESOURCE_ID = 'weather-chat';
+const RESOURCE_ID = 'chat-user';
 
 export async function POST(req: Request) {
     const params = await req.json();
+    const threadId = params.threadId;
+
     const stream = await handleChatStream({
         mastra,
-        agentId: 'weather-agent',
+        agentId: 'creative-director',
         params: {
             ...params,
             memory: {
                 ...params.memory,
-                thread: THREAD_ID,
+                thread: threadId,
                 resource: RESOURCE_ID,
             },
         },
@@ -24,13 +25,20 @@ export async function POST(req: Request) {
     return createUIMessageStreamResponse({ stream });
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+    const { searchParams } = new URL(req.url);
+    const threadId = searchParams.get('threadId');
+
+    if (!threadId) {
+        return NextResponse.json([]);
+    }
+
     const memory = await mastra.getAgentById('weather-agent').getMemory();
     let response = null;
 
     try {
         response = await memory?.recall({
-            threadId: THREAD_ID,
+            threadId,
             resourceId: RESOURCE_ID,
         });
     } catch {
@@ -38,6 +46,5 @@ export async function GET() {
     }
 
     const uiMessages = toAISdkV5Messages(response?.messages || []);
-
     return NextResponse.json(uiMessages);
 }

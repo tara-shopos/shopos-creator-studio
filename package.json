@@ -20,12 +20,14 @@
     "node": ">=22.13.0"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.31",
     "@ai-sdk/react": "latest",
     "@mastra/ai-sdk": "latest",
     "@mastra/core": "^1.6.0",
     "@mastra/evals": "^1.1.2",
     "@mastra/libsql": "^1.6.0",
     "@mastra/loggers": "^1.0.2",
+    "@mastra/mcp": "^1.0.1",
     "@mastra/memory": "^1.5.0",
     "@mastra/observability": "^1.2.1",
     "@radix-ui/react-use-controllable-state": "^1.2.2",

@@ -26,7 +26,10 @@ export type ToolProps = ComponentProps<typeof Collapsible>;
 
 export const Tool = ({ className, ...props }: ToolProps) => (
   <Collapsible
-    className={cn("group not-prose mb-4 w-full rounded-md border", className)}
+    className={cn(
+      "group not-prose mb-4 w-full min-w-0 overflow-hidden rounded-md border",
+      className
+    )}
     {...props}
   />
 );
@@ -106,7 +109,7 @@ export type ToolContentProps = ComponentProps<typeof CollapsibleContent>;
 export const ToolContent = ({ className, ...props }: ToolContentProps) => (
   <CollapsibleContent
     className={cn(
-      "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 space-y-4 p-4 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
+      "data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-top-2 data-[state=open]:slide-in-from-top-2 min-w-0 space-y-4 overflow-hidden p-4 text-popover-foreground outline-none data-[state=closed]:animate-out data-[state=open]:animate-in",
       className
     )}
     {...props}
@@ -133,6 +136,14 @@ export type ToolOutputProps = ComponentProps<"div"> & {
   errorText: ToolPart["errorText"];
 };
 
+function isImageOutput(
+  output: unknown
+): output is { base64: string; mimeType: string } {
+  if (typeof output !== "object" || output === null) return false;
+  const obj = output as Record<string, unknown>;
+  return typeof obj.base64 === "string" && typeof obj.mimeType === "string";
+}
+
 export const ToolOutput = ({
   className,
   output,
@@ -141,6 +152,21 @@ export const ToolOutput = ({
 }: ToolOutputProps) => {
   if (!(output || errorText)) {
     return null;
+  }
+
+  if (isImageOutput(output)) {
+    return (
+      <div className={cn("space-y-2", className)} {...props}>
+        <h4 className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+          Generated Image
+        </h4>
+        <img
+          src={`data:${output.mimeType};base64,${output.base64}`}
+          alt="Generated image"
+          className="h-auto max-w-full rounded-md"
+        />
+      </div>
+    );
   }
 
   let Output = <div>{output as ReactNode}</div>;
